@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>BLU Spin RPC</title>
+  <style>
+    body {
+      background: #0B88F8;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 50px;
+    }
+    input {
+      padding: 12px;
+      font-size: 18px;
+      width: 320px;
+    }
+    button {
+      margin-top: 10px;
+      font-size: 20px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #spin {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Send 2,000,000 $BLU tokens to:</h2>
+  <p><b>EH1UKhLL9MTny9sCCGGrzVrbBAVAL6V3XsBXZvQ4wfe8</b></p>
+  <input id="wallet" placeholder="Your SOL address" />
+  <br />
+  <button onclick="check()">Sent</button>
+  <div id="msg"></div>
+  <button id="retry" style="display:none;" onclick="check()">Check Again</button>
+  <button id="spin" onclick="alert('SPIN!')" style="display:none;">SPIN</button>
+
+  <script>
+    async function check() {
+      const wallet = document.getElementById("wallet").value.trim();
+      const msg = document.getElementById("msg");
+      const spin = document.getElementById("spin");
+      const retry = document.getElementById("retry");
+      msg.textContent = "Verifying...";
+
+      try {
+        const res = await fetch("/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ wallet })
+        });
+        const json = await res.json();
+        if (json.ok) {
+          msg.textContent = "✅ Verified!";
+          spin.style.display = "inline-block";
+          retry.style.display = "none";
+        } else {
+          msg.textContent = "❌ Verification failed.";
+          retry.style.display = "inline-block";
+        }
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "⚠️ RPC timeout – try again.";
+        retry.style.display = "inline-block";
+      }
+    }
+  </script>
+</body>
+</html>
